@@ -32,9 +32,24 @@ def handle_instagram_events():
     """Listens for new comments and automatically sends a DM."""
     data = request.json
     
-    # Ensure the incoming webhook data has entries
     if not data or 'entry' not in data:
         return jsonify({"status": "ignored"}), 200
+
+    for entry in data['entry']:
+        if 'changes' in entry:
+            for change in entry['changes']:
+                if change.get('field') == 'comments':
+                    comment_data = change.get('value', {})
+                    comment_text = comment_data.get('text', '').strip().lower()
+                    
+                    if TRIGGER_KEYWORD in comment_text:
+                        # CRITICAL FIX: Extract the comment_id, not the user_id
+                        comment_id = comment_data.get('id')
+                        
+                        if comment_id:
+                            send_automated_dm(comment_id)
+                            
+    return jsonify({"status": "success"}), 200
 
     for entry in data['entry']:
         # Look for changes/comments in the payload
