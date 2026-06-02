@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 # CONFIGURATION
 # Paste your long Page Access Token from the Graph API Explorer here
-PAGE_ACCESS_TOKEN = "EAAcW8Oqgq3cBRlfnKlMRWe45IBqUZBfJKAzYMk5NmrtnpyTq2Qo5en0AZBl8siP8SN9VcDtKCrBZA2qzaVHXq6yFPcu7G66iIheYa680wBtQCAZAN0LTBvOxokL9ZAyX37tnH4vQ7LiUOVmfZCp9YFQakL6O4gXhFoBa43ikJenAeluFdbNObrZBbIPhBm5DTZCAeZBbVOfFGv0atRZBg8XRZB2a5cLWGEr55IAiAB0q7G5G3QMEaruqq1OdDwgZACb29zhZAn4N4yWf6jiplKNtJbWMCQd0rNTWfE3U8phhtwAZDZD"
+PAGE_ACCESS_TOKEN = "IGAAL60sds6ilBZAGI4akd3eVR3VDBwZAXpkb2djS0JKeHdYa1VUdFVxa3NVNUkwaEZA6SExLaGNjMXg5UC14a1pfNHVfRDRtaVJUcWhuUVd4ZAEtrdzlSdGpudExCSnQ4b21DMl9kQUdBaUdsR0NjWVhjbHBaTXRJYXRJNnp2RElfQQZDZD"
 # Must match whatever you typed in the Meta Developer settings
 VERIFY_TOKEN = "shieldcal_verification_secure" 
 # The exact keyword you want to listen for
