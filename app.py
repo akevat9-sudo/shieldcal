@@ -72,8 +72,7 @@ def handle_instagram_events():
                             
     return jsonify({"status": "success"}), 200
 
-
-def send_automated_dm(recipient_id):
+def send_automated_dm(comment_id):
     """Fires a POST request to the Instagram Messages API endpoint."""
     url = f"https://graph.facebook.com/v25.0/me/messages?access_token={PAGE_ACCESS_TOKEN}"
     
@@ -82,8 +81,9 @@ def send_automated_dm(recipient_id):
         f"to help protect your trading margin: {SHIELDCAL_LINK}"
     )
     
+    # CRITICAL FIX: Pass the comment_id to authorize the Private Reply
     payload = {
-        "recipient": {"id": recipient_id},
+        "recipient": {"comment_id": comment_id},
         "message": {"text": message_text}
     }
     
@@ -91,11 +91,11 @@ def send_automated_dm(recipient_id):
     
     try:
         response = requests.post(url, json=payload, headers=headers)
-        response_data = response.json()
         if response.status_code == 200:
-            print(f"Successfully sent DM to User ID: {recipient_id}")
+            print(f"Successfully sent DM for Comment ID: {comment_id}")
         else:
-            print(f"Failed to send DM: {response_data}")
+            # This will print the exact reason if Meta blocks it again
+            print(f"Failed to send DM. Meta error: {response.json()}")
     except Exception as e:
         print(f"Error firing DM request: {str(e)}")
 
