@@ -8,7 +8,7 @@ app = Flask(__name__)
 # CONFIGURATION & ENVIRONMENT VARIABLES
 # ==============================================================================
 # The TRIGGER_KEYWORD has been removed since this now catches ALL comments.
-PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN", "EAAcW8Oqgq3cBRsEy1K3VxZCwzf9pc7vyYoCZCHf81SPW8QiawreDEZCXmRPiNEIMLlV3mR3zBjMaaSFHP25DtBJJrrJtFgcO6RAkNHHpcLLTBwPG4WaS469vZB5mTZAykxklZCYQtuNQJriXvUh6fyaxtM7dS8kNBTxCtZAuinG2Y9fJBonoqxhjBZAiZC6Ks5LsuKScT3LfpZA8QPG0Y3vx0wwL4oRXc9mN4ZCVAKgZCwADLEjQi9PVLqUypqiL2psZD")
+PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN", "EAAcW8Oqgq3cBRiqTLWsZBOCLbnwJMyonslFQOcTjDAHKBBeeQZCZAXZC5NHZBgZAZBiDl6vmUHbW6adcq0FeKibBOvyX1wiXC0WoPVdbasOKHTgppF16mZBQwZBemlbASFMfJDAZCSsDIUsWLOLA5slQoAKOSxCO8rbfB6z4khhw9Bp27UfuDy7HgdLnJNZC272ZBZCtTpkm6L9E6C4Ysf1lYSj3x")
 SHIELDCAL_LINK = os.environ.get("SHIELDCAL_LINK", "https://shieldcal.lunaticmarbles.com/")
 VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "shieldcal_verification_secure")
 
