@@ -7,50 +7,56 @@ app = Flask(__name__)
 # ==============================================================================
 # CONFIGURATION & ENVIRONMENT VARIABLES
 # ==============================================================================
+# The TRIGGER_KEYWORD has been removed since this now catches ALL comments.
 PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN", "EAAcW8Oqgq3cBRsEy1K3VxZCwzf9pc7vyYoCZCHf81SPW8QiawreDEZCXmRPiNEIMLlV3mR3zBjMaaSFHP25DtBJJrrJtFgcO6RAkNHHpcLLTBwPG4WaS469vZB5mTZAykxklZCYQtuNQJriXvUh6fyaxtM7dS8kNBTxCtZAuinG2Y9fJBonoqxhjBZAiZC6Ks5LsuKScT3LfpZA8QPG0Y3vx0wwL4oRXc9mN4ZCVAKgZCwADLEjQi9PVLqUypqiL2psZD")
-TRIGGER_KEYWORD = os.environ.get("TRIGGER_KEYWORD", "safe").lower().strip()
 SHIELDCAL_LINK = os.environ.get("SHIELDCAL_LINK", "https://shieldcal.lunaticmarbles.com/")
 VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "shieldcal_verification_secure")
 
 # ==============================================================================
-# WEBHOOK VALIDATION
+# WEBHOOK VALIDATION (Meta Setup)
 # ==============================================================================
 @app.route('/webhook', methods=['GET'])
 def verify_webhook():
+    """Handles the initial handshake validation from Meta."""
     mode = request.args.get('hub.mode')
     token = request.args.get('hub.verify_token')
     challenge = request.args.get('hub.challenge')
 
     if mode and token:
         if mode == 'subscribe' and token == VERIFY_TOKEN:
+            print("Webhook verified successfully!")
             return challenge, 200
         else:
             return "Verification token mismatch", 403
     return "Hello World", 200
 
 # ==============================================================================
-# MAIN WEBHOOK ROUTER
+# MAIN WEBHOOK ROUTER (The Interactive Funnel)
 # ==============================================================================
 @app.route('/webhook', methods=['POST'])
 def handle_instagram_events():
+    """Listens for comments and DM replies to run the multi-step funnel."""
     data = request.json
+    
     if not data or 'entry' not in data:
         return jsonify({"status": "ignored"}), 200
 
     for entry in data['entry']:
         
-        # --- STEP 1: Catch Public Comments ---
+        # --- STEP 1: Catch ALL Public Comments ---
         if 'changes' in entry:
             for change in entry['changes']:
                 if change.get('field') == 'comments':
                     comment_data = change.get('value', {})
-                    comment_text = comment_data.get('text', '').strip().lower()
+                    comment_text = comment_data.get('text', '')
                     comment_id = comment_data.get('id')
                     
-                    if TRIGGER_KEYWORD in comment_text and comment_id:
+                    # If a comment exists, fire the reply regardless of what they typed
+                    if comment_id:
+                        print(f"Comment detected: '{comment_text}'. Sending auto-reply...")
                         send_initial_private_reply(comment_id)
                         
-        # --- STEPS 2 & 3: Catch DMs & Button Clicks ---
+        # --- STEPS 2 & 3: Catch Direct Messages & Button Clicks ---
         if 'messaging' in entry:
             for message_event in entry['messaging']:
                 # Skip echoes, delivery receipts, and read notifications
@@ -63,12 +69,14 @@ def handle_instagram_events():
                 if 'message' in message_event:
                     msg_text = message_event['message'].get('text', '').strip().lower()
                     if msg_text == 'yes':
+                        print(f"User {sender_id} replied YES. Sending follow gate...")
                         send_follow_gate_card(sender_id)
                 
                 # Check for Card Button clicks (Postbacks)
                 if 'postback' in message_event:
                     postback_payload = message_event['postback'].get('payload')
                     if postback_payload == 'USER_CLICKED_FOLLOWED':
+                        print(f"User {sender_id} clicked Followed. Delivering final link...")
                         send_final_link_card(sender_id)
 
     return jsonify({"status": "success"}), 200
@@ -83,10 +91,11 @@ def send_initial_private_reply(comment_id):
     payload = {
         "recipient": {"comment_id": comment_id},
         "message": {
-            "text": "Hey! 👋 I've got the Shieldcal risk calculator ready for you.\n\nJust reply to this message with the word 'YES' and I'll send it right over!"
+            "text": "Hey! 👋 I've got the risk calculator ready for you.\n\nJust reply to this message with the word 'YES' and I'll send it right over!"
         }
     }
-    requests.post(url, json=payload, headers={"Content-Type": "application/json"})
+    headers = {"Content-Type": "application/json"}
+    requests.post(url, json=payload, headers=headers)
 
 def send_follow_gate_card(sender_id):
     """Step 2: A visual Generic Template card asking the user to follow."""
@@ -115,7 +124,8 @@ def send_follow_gate_card(sender_id):
             }
         }
     }
-    requests.post(url, json=payload, headers={"Content-Type": "application/json"})
+    headers = {"Content-Type": "application/json"}
+    requests.post(url, json=payload, headers=headers)
 
 def send_final_link_card(sender_id):
     """Step 3: Delivers the final generic template card containing the URL link."""
@@ -144,8 +154,10 @@ def send_final_link_card(sender_id):
             }
         }
     }
-    requests.post(url, json=payload, headers={"Content-Type": "application/json"})
+    headers = {"Content-Type": "application/json"}
+    requests.post(url, json=payload, headers=headers)
 
 if __name__ == '__main__':
+    # Binds to 0.0.0.0 and reads port environment variables assigned by Render
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
